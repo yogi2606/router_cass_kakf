@@ -1,0 +1,6 @@
+package: practise/router_cass_kakf
+import:
+- package: github.com/Shopify/sarama
+- package: github.com/gocql/gocql
+- package: github.com/gorilla/mux
+- package: github.com/mitchellh/mapstructure
