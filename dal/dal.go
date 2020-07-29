@@ -8,8 +8,12 @@ import (
 	"github.com/mitchellh/mapstructure"
 )
 
+//CRMImpl CRMImpl
+type CRMImpl struct {
+}
+
 //InsertCRM InsertCRM
-func InsertCRM(customer *model.Customer) error {
+func (c CRMImpl) InsertCRM(customer *model.Customer) error {
 	var gocqlUUIDgo gocql.UUID // FormToUser() is included in Users/processing.go
 	// we will describe this later
 	// attempt to save our data to Cassandra
@@ -26,7 +30,7 @@ func InsertCRM(customer *model.Customer) error {
 }
 
 //GetAll GetAll
-func GetAll() []model.Customer {
+func (c CRMImpl) GetAll() []model.Customer {
 	var customers []model.Customer
 	m := map[string]interface{}{}
 
@@ -48,7 +52,7 @@ func GetAll() []model.Customer {
 }
 
 //Get Get
-func Get(customerID string) []model.Customer {
+func (c CRMImpl) Get(customerID string) []model.Customer {
 	var customers []model.Customer
 	m := map[string]interface{}{}
 
@@ -70,7 +74,7 @@ func Get(customerID string) []model.Customer {
 }
 
 //Delete Delete
-func Delete(customerID string) error {
+func (c CRMImpl) Delete(customerID string) error {
 	err := cassandra.Session.Query("DELETE FROM crm.customer where customerid=?", customerID).Exec()
 	return err
 

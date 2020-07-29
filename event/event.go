@@ -3,6 +3,8 @@ package event
 import (
 	"fmt"
 	"practise/router_cass_kakf/kafka"
+
+	"github.com/Shopify/sarama"
 )
 
 const (
@@ -10,22 +12,31 @@ const (
 	CRMTopic = "crmtopic"
 )
 
-/* var producer sarama.SyncProducer
+var producer sarama.SyncProducer
+var consumer sarama.Consumer
 var err error
 
 func init() {
-	producer, err = kafka.NewProducer()
+	consumer, err = kafka.NewConsumer()
 	if err != nil {
-		log.Fatal("error while creating producer", err)
+		fmt.Println("error while creating consumer", err)
 	}
-} */
-
-//SendDataToKafka SendDataToKafka
-func SendDataToKafka(byteArr []byte) {
-	producer, err := kafka.NewProducer()
+	producer, err = kafka.NewProducer()
 	if err != nil {
 		fmt.Println("error while creating producer", err)
 	}
+}
+
+//KafkaImpl KafkaImpl
+type KafkaImpl struct {
+}
+
+//SendDataToKafka SendDataToKafka
+func (k KafkaImpl) SendDataToKafka(byteArr []byte) {
+	/* producer, err := kafka.NewProducer()
+	if err != nil {
+		fmt.Println("error while creating producer", err)
+	} */
 	message := kafka.PrepareMessage(CRMTopic, string(byteArr))
 	prtn, offs, err := producer.SendMessage(message)
 	if err != nil {
@@ -35,10 +46,10 @@ func SendDataToKafka(byteArr []byte) {
 }
 
 //ReceiveDataFromKafka ReceiveDataFromKafka
-func ReceiveDataFromKafka() {
-	consumer, err := kafka.NewConsumer()
+func (k KafkaImpl) ReceiveDataFromKafka() {
+	/* consumer, err := kafka.NewConsumer()
 	if err != nil {
 		fmt.Println("error while creating consumer", err)
-	}
+	} */
 	kafka.Subscribe(CRMTopic, consumer)
 }

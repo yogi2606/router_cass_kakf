@@ -30,6 +30,12 @@ func Subscribe(topic string, consumer sarama.Consumer) {
 			fmt.Println("ConsumePartition", err)
 		}
 		go func(pc sarama.PartitionConsumer) {
+			defer func() {
+				r := recover()
+				if r != nil {
+					fmt.Println(r)
+				}
+			}()
 			for {
 				select {
 				case err := <-pc.Errors():

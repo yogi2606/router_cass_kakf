@@ -11,15 +11,20 @@ import (
 	"github.com/gorilla/mux"
 )
 
+//CRMHandler CRMHandler
+type CRMHandler struct {
+	CRM   dal.CRMInterface
+	Kafka event.KafkaInterface
+}
+
 // GetAllHandler is get handler
-func GetAllHandler(w http.ResponseWriter, r *http.Request) {
-	customers := dal.GetAll()
-	event.ReceiveDataFromKafka()
+func (c CRMHandler) GetAllHandler(w http.ResponseWriter, r *http.Request) {
+	customers := c.CRM.GetAll()
 	json.NewEncoder(w).Encode(customers)
 }
 
 //PostHandler PostHandler
-func PostHandler(w http.ResponseWriter, r *http.Request) {
+func (c CRMHandler) PostHandler(w http.ResponseWriter, r *http.Request) {
 	var customer model.Customer
 	defer r.Body.Close()
 	err := json.NewDecoder(r.Body).Decode(&customer)
@@ -29,7 +34,7 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// customer.CustomerID = strconv.Itoa(rand.Intn(1000000))
-	err = dal.InsertCRM(&customer)
+	err = c.CRM.InsertCRM(&customer)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode("user not created")
@@ -40,26 +45,31 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Println("failed to marshall", err)
 	}
-	event.SendDataToKafka(bArr)
+	c.Kafka.SendDataToKafka(bArr)
 	json.NewEncoder(w).Encode("user created")
 
 }
 
 // GetHandler is get handler
-func GetHandler(w http.ResponseWriter, r *http.Request) {
+func (c CRMHandler) GetHandler(w http.ResponseWriter, r *http.Request) {
 	customerID := mux.Vars(r)["customerID"]
-	customers := dal.Get(customerID)
+	customers := c.CRM.Get(customerID)
 	json.NewEncoder(w).Encode(customers)
 }
 
 // DeleteHandler is get handler
-func DeleteHandler(w http.ResponseWriter, r *http.Request) {
+func (c CRMHandler) DeleteHandler(w http.ResponseWriter, r *http.Request) {
 	customerID := mux.Vars(r)["customerID"]
-	err := dal.Delete(customerID)
+	err := c.CRM.Delete(customerID)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode("error in deletion")
 		return
 	}
 	json.NewEncoder(w).Encode("record deleted")
+}
+
+// StartConsumer is get handler
+func (c CRMHandler) StartConsumer(w http.ResponseWriter, r *http.Request) {
+	c.Kafka.ReceiveDataFromKafka()
 }
