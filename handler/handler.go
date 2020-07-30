@@ -20,6 +20,9 @@ type CRMHandler struct {
 // GetAllHandler is get handler
 func (c CRMHandler) GetAllHandler(w http.ResponseWriter, r *http.Request) {
 	customers := c.CRM.GetAll()
+	if len(customers) < 1 {
+		w.WriteHeader(http.StatusNotFound)
+	}
 	json.NewEncoder(w).Encode(customers)
 }
 
@@ -54,6 +57,9 @@ func (c CRMHandler) PostHandler(w http.ResponseWriter, r *http.Request) {
 func (c CRMHandler) GetHandler(w http.ResponseWriter, r *http.Request) {
 	customerID := mux.Vars(r)["customerID"]
 	customers := c.CRM.Get(customerID)
+	if len(customers) < 1 {
+		w.WriteHeader(http.StatusNotFound)
+	}
 	json.NewEncoder(w).Encode(customers)
 }
 
