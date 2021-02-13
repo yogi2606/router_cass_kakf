@@ -1,0 +1,2785 @@
+openapi: 3.0.1
+info:
+  title: Asset API
+  description: REST API Endpoints exposed by Juno Asset Service.
+  version: 1.0.0
+servers:
+- url: http://internal-continuum-asset-service-elb-int-1972580147.ap-south-1.elb.amazonaws.com/asset
+tags:
+- name: Asset
+  description: APIs to return asset data, parter wise, summary asset, endpoint asset
+- name: Interasset
+  description: Everything about the Inter Asset
+- name: Endpoint
+  description: APIs related to endpoint, like change in endpoint type, change in friendly
+    name etc.
+- name: virtualization
+  description: Everything about the virtualization
+paths:
+  /v1/partners/{partnerID}/clients/{clientID}/sites/{siteID}/hosts/{hostId}:
+    get:
+      tags:
+      - virtualization
+      description: "Returns host details \n"
+      parameters:
+      - name: partnerID
+        in: path
+        description: partnerID
+        required: true
+        schema:
+          type: string
+      - name: clientID
+        in: path
+        description: ClientID
+        required: true
+        schema:
+          type: string
+      - name: siteID
+        in: path
+        description: SiteID
+        required: true
+        schema:
+          type: string
+      - name: hostId
+        in: path
+        description: HostID (EndpointID) of Host System
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Retrieved host details successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/hostinventory'
+        404:
+          description: Resource not found
+          content: {}
+        500:
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+  /v1/partners/{partnerID}/clients/{clientID}/sites/{siteID}/hosts/{hostId}/guests:
+    get:
+      tags:
+      - virtualization
+      description: |
+        Returns all guests details.
+      parameters:
+      - name: partnerID
+        in: path
+        description: Partner ID of Host System
+        required: true
+        schema:
+          type: string
+      - name: clientID
+        in: path
+        description: Client ID of the Host System
+        required: true
+        schema:
+          type: string
+      - name: siteID
+        in: path
+        description: Site ID of Host System
+        required: true
+        schema:
+          type: string
+      - name: hostId
+        in: path
+        description: Host ID(EndpointID) of Host System
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Retrieved guest details successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/guestinventory'
+        404:
+          description: Resource not found
+          content: {}
+        500:
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+  /v2/partners/{partnerID}/endpoints:
+    get:
+      tags:
+      - Endpoint
+      description: |
+        Returns all endpoints of a given partner id
+      parameters:
+      - name: partnerID
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Retrieved endpoints successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/endpointList'
+        404:
+          description: Resource not found
+          content: {}
+        500:
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+        503:
+          description: Service Unavailable
+          content: {}
+  /v2/partners/{partnerID}/clients/{clientID}/endpoints:
+    get:
+      tags:
+      - Endpoint
+      description: |
+        Returns all endpoints of a given partner and client id
+      parameters:
+      - name: partnerID
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: clientID
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Retrieved endpoints successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/endpointList'
+        404:
+          description: Resource not found
+          content: {}
+        500:
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+        503:
+          description: Service Unavailable
+          content: {}
+  /v2/partners/{partnerID}/clients/{clientID}/sites/{siteID}/endpoints:
+    get:
+      tags:
+      - Endpoint
+      description: |
+        Returns all endpoints of a given partner, client and site id
+      parameters:
+      - name: partnerID
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: clientID
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: siteID
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Retrieved endpoints successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/endpointList'
+        404:
+          description: Resource not found
+          content: {}
+        500:
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+        503:
+          description: Service Unavailable
+          content: {}
+  /v1/partner/{partnerID}/endpoint/{endpointID}/endpointtype:
+    put:
+      tags:
+      - Endpoint
+      description: |
+        Updates the endpoint type of the resource
+      parameters:
+      - name: partnerID
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: endpointID
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        description: Payload to update friendly name
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/endpointTypeUpdatePayload'
+        required: true
+      responses:
+        204:
+          description: Successful response
+          content: {}
+        400:
+          description: Bad request
+          content: {}
+        404:
+          description: Resource not found
+          content: {}
+        500:
+          description: Internal Server Error
+          content: {}
+        503:
+          description: Service Unavailable
+          content: {}
+      x-codegen-request-body-name: body
+  /v1/partner/{partnerID}/endpoints:
+    get:
+      tags:
+      - Asset
+      description: |
+        Returns all asset data of all endpoint_ids of a given partner
+      parameters:
+      - name: partnerID
+        in: path
+        description: Partner ID of Partner
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Successful response
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/assetCollection'
+        500:
+          description: Internal Server Error
+          content: {}
+        503:
+          description: Service Unavailable
+          content: {}
+  /v1/partner/{partnerID}/endpoints/{endpointID}:
+    get:
+      tags:
+      - Asset
+      - x-EndpointEntity-Extension
+      description: |
+        Returns asset data of a given endpointID from the data source.
+      parameters:
+      - name: endpointID
+        in: path
+        description: endpointID of Agent
+        required: true
+        schema:
+          type: string
+      - name: partnerID
+        in: path
+        description: Partner ID of Partner
+        required: true
+        schema:
+          type: string
+      - name: field
+        in: query
+        description: Projection support to retrieve only fields that is needed, for
+          ex ?field=os&field=system will retrieve only Os and system of endpoint.
+          Value of field must match with the json field returned in response
+        schema:
+          type: string
+      responses:
+        200:
+          description: Successful response
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/assetCollection'
+        500:
+          description: Internal Server Error
+          content: {}
+        503:
+          description: Service Unavailable
+          content: {}
+  /v1/partner/{partnerID}/sites/{siteIds}/summary:
+    get:
+      tags:
+      - Asset
+      description: |
+        Returns system and OS data of all endpoint_ids of a given site of a partner
+      parameters:
+      - name: partnerID
+        in: path
+        description: Partner ID of Partner
+        required: true
+        schema:
+          type: string
+      - name: siteIds
+        in: path
+        description: comma separated list of siteIDs of a partner
+        required: true
+        schema:
+          type: string
+      - name: filter
+        in: query
+        description: To filter response on the basis of filter query (ex. endpointType
+          not in(Server,Desktop))
+        schema:
+          type: string
+      responses:
+        200:
+          description: Successful response
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/assetSummary'
+        400:
+          description: Bad Request (Ex. Invalid filter)
+          content: {}
+        500:
+          description: Internal Server Error
+          content: {}
+        503:
+          description: Service Unavailable
+          content: {}
+  /v1/partner/{partnerID}/endpoint/{endpointID}/friendlyname:
+    put:
+      tags:
+      - Endpoint
+      description: |
+        Update friendly name of an endpoint of a given partner
+      parameters:
+      - name: endpointID
+        in: path
+        description: endpointID of Agent
+        required: true
+        schema:
+          type: string
+      - name: partnerID
+        in: path
+        description: Partner ID of Partner
+        required: true
+        schema:
+          type: string
+      requestBody:
+        description: Payload to update friendly name
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/friendlynameUpdatePayload'
+        required: true
+      responses:
+        204:
+          description: Successful response
+          content: {}
+        400:
+          description: Bad request
+          content: {}
+        404:
+          description: Resource not found
+          content: {}
+        500:
+          description: Internal Server Error
+          content: {}
+        503:
+          description: Service Unavailable
+          content: {}
+      x-codegen-request-body-name: body
+  /v1/partners/{partnerID}/clients/{clientID}/sites/{siteID}/endpoints/{endpointID}/relations:
+    get:
+      tags:
+      - Interasset
+      description: Returns the Host & Guest mapping
+      parameters:
+      - name: partnerID
+        in: path
+        description: partnerID
+        required: true
+        schema:
+          type: string
+      - name: clientID
+        in: path
+        description: ClientID
+        required: true
+        schema:
+          type: string
+      - name: siteID
+        in: path
+        description: SiteID
+        required: true
+        schema:
+          type: string
+      - name: endpointID
+        in: path
+        description: EndpointID
+        required: true
+        schema:
+          type: string
+      - name: depth
+        in: query
+        description: 'Specify the depth of the relations mapping, default is: 1'
+        schema:
+          type: number
+          default: 1.0
+      responses:
+        200:
+          description: Retrieved mapping successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InterAsset'
+        404:
+          description: Could not find any mapping
+          content: {}
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        503:
+          description: Service Unavailable
+          content: {}
+  /v2/partners/{partnerID}/clients/{clientID}/sites/{siteID}/endpoints/{endpointID}/relations:
+    get:
+      tags:
+      - Interasset
+      description: Returns the relationship of endpoint
+      parameters:
+      - name: partnerID
+        in: path
+        description: partnerID
+        required: true
+        schema:
+          type: string
+      - name: clientID
+        in: path
+        description: ClientID
+        required: true
+        schema:
+          type: string
+      - name: siteID
+        in: path
+        description: SiteID
+        required: true
+        schema:
+          type: string
+      - name: endpointID
+        in: path
+        description: EndpointID
+        required: true
+        schema:
+          type: string
+      - name: depth
+        in: query
+        description: 'Specify the depth of the relations mapping, default is: 1'
+        schema:
+          type: number
+          default: 1.0
+      responses:
+        200:
+          description: Retrieved mapping successfully. Dependeding on the hierarchy
+            and depth level, relatedTo attribute can expand and can have further relatedTo
+            attribute
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InterAssetV2'
+        404:
+          description: Could not find any mapping
+          content: {}
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        503:
+          description: Service Unavailable
+          content: {}
+  /v1/partners/{partnerID}/services:
+    get:
+      tags:
+      - Asset
+      description: Returns unique list of services across endpoints
+      parameters:
+      - name: partnerID
+        in: path
+        description: partnerID
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceList'
+        404:
+          description: Partner not found
+          content: {}
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        503:
+          description: Service Unavailable
+          content: {}
+components:
+  schemas:
+    assetCollection:
+      type: object
+      properties:
+        createTimeUTC:
+          type: string
+          description: CreateTimeUTC of agent
+          format: date-time
+        agentInstalledUTC:
+          type: string
+          description: agentInstalledUTC of agent
+          format: date-time
+        createdBy:
+          type: string
+          description: Created by user
+        name:
+          type: string
+          description: Name
+        type:
+          type: string
+          description: Collection of all asset information
+        endpointID:
+          type: string
+          description: Endpoint ID of the managed endpoint resource
+        partnerID:
+          type: string
+          description: Partner ID of partner
+        clientID:
+          type: string
+          description: Client ID or company
+        siteID:
+          type: string
+          description: Site ID
+        regId:
+          type: string
+          description: Registration ID of Old Agent
+        friendlyName:
+          type: string
+          description: friendly name of the managed endpoint
+        remoteAddress:
+          type: string
+          description: Public IP address of the endpoint from which HTTP request was
+            received
+        resourceType:
+          type: string
+          description: Type of the endpoint. Example- Desktop/Server/Firewall/Mobile
+            Device
+        endpointType:
+          type: string
+          description: Type of the endpoint from the user perspective. Example- Desktop/Server
+        rolesFeatures:
+          type: array
+          description: Roles and features of the endpoint.
+          items:
+            type: string
+        subResourceType:
+          type: string
+          description: Sub-resource type of the endpoint.
+          example: Virtual
+          enum:
+          - Virtual
+          - Physical
+        baseBoard:
+          $ref: '#/components/schemas/assetBaseBoard'
+        power:
+          $ref: '#/components/schemas/assetPower'
+        bios:
+          $ref: '#/components/schemas/assetBios'
+        drives:
+          type: array
+          description: Drive interfaces information
+          items:
+            $ref: '#/components/schemas/assetDrive'
+        physicalMemory:
+          type: array
+          items:
+            $ref: '#/components/schemas/assetMemory'
+        networks:
+          type: array
+          description: Network interfaces information
+          items:
+            $ref: '#/components/schemas/assetNetwork'
+        ethernet:
+          type: array
+          description: Ethernet information
+          items:
+            $ref: '#/components/schemas/assetEthernet'
+        firewall:
+          type: array
+          description: Firewall information
+          items:
+            $ref: '#/components/schemas/assetFirewall'
+        locations:
+          type: array
+          items:
+            $ref: '#/components/schemas/assetLocations'
+        cardReaders:
+          type: array
+          items:
+            $ref: '#/components/schemas/assetCardReader'
+        graphicCards:
+          type: array
+          items:
+            $ref: '#/components/schemas/assetGraphicCard'
+        bluetooth:
+          $ref: '#/components/schemas/assetBluetooth'
+        usbs:
+          type: array
+          items:
+            $ref: '#/components/schemas/assetUSBBus'
+        diagnostic:
+          $ref: '#/components/schemas/assetAssetDiagnostic'
+        discBurning:
+          type: array
+          items:
+            $ref: '#/components/schemas/assetDiscBurning'
+        thunderbolts:
+          type: array
+          items:
+            $ref: '#/components/schemas/assetThunderbolt'
+        os:
+          $ref: '#/components/schemas/assetOs'
+        processors:
+          type: array
+          description: Processor information
+          items:
+            $ref: '#/components/schemas/assetProcessor'
+        raidController:
+          $ref: '#/components/schemas/assetRaidController'
+        system:
+          $ref: '#/components/schemas/assetSystem'
+        installedSoftwares:
+          type: array
+          description: List of softwares installed on the endpoint
+          items:
+            $ref: '#/components/schemas/assetInstalledSoftwares'
+        keyboards:
+          type: array
+          description: List of keyboards attached to the endpoint
+          items:
+            $ref: '#/components/schemas/assetKeyboards'
+        mouse:
+          type: array
+          description: List of mouse attached to the endpoint
+          items:
+            $ref: '#/components/schemas/mouse'
+        monitors:
+          type: array
+          description: List of monitors attached to the endpoint
+          items:
+            $ref: '#/components/schemas/assetMonitors'
+        physicalDrive:
+          type: array
+          description: List of physical drive attached to a system
+          items:
+            $ref: '#/components/schemas/physicalDrive'
+        users:
+          type: array
+          description: List of User accounts on the system
+          items:
+            $ref: '#/components/schemas/user'
+        services:
+          type: array
+          description: List of services on the endpoint
+          items:
+            $ref: '#/components/schemas/assetService'
+        shares:
+          type: array
+          description: List of shares on the endpoint
+          items:
+            $ref: '#/components/schemas/assetShares'
+        softwareLicenses:
+          type: array
+          description: List of software licenses on the endpoint
+          items:
+            $ref: '#/components/schemas/assetSoftwareLicenses'
+        pciDevices:
+          type: array
+          description: List of software licenses on the endpoint
+          items:
+            $ref: '#/components/schemas/assetPCIDevices'
+        logicalVolume:
+          type: array
+          description: List of logical volume on the endpoint
+          items:
+            $ref: '#/components/schemas/assetLogicalVolume'
+    assetSummary:
+      type: object
+      properties:
+        createTimeUTC:
+          type: string
+          description: CreateTimeUTC of agent
+          format: date-time
+        agentInstalledUTC:
+          type: string
+          description: agentInstalledUTC of agent
+          format: date-time
+        createdBy:
+          type: string
+          description: Created by user
+        endpointID:
+          type: string
+          description: Endpoint ID of the managed endpoint resource
+        partnerID:
+          type: string
+          description: Partner ID of partner
+        clientID:
+          type: string
+          description: Client ID or company
+        siteID:
+          type: string
+          description: Site ID
+        regId:
+          type: string
+          description: Registration ID of Old Agent
+        friendlyName:
+          type: string
+          description: friendly name of the managed endpoint
+        remoteAddress:
+          type: string
+          description: Public IP address of the endpoint from which HTTP request was
+            received
+        resourceType:
+          type: string
+          description: Type of the endpoint. Example- Desktop/Server/Firewall/Mobile
+            Device
+        endpointType:
+          type: string
+          description: Type of the endpoint from the user perspective. Example- Desktop/Server
+        networks:
+          type: array
+          items:
+            $ref: '#/components/schemas/assetNetwork'
+        os:
+          $ref: '#/components/schemas/assetOs'
+        system:
+          $ref: '#/components/schemas/assetSystem'
+        rolesFeatures:
+          type: array
+          description: Roles and features of the endpoint.
+          items:
+            type: string
+    assetBaseBoard:
+      type: object
+      properties:
+        product:
+          type: string
+          description: BaseBoard product name
+        manufacturer:
+          type: string
+          description: BaseBoard product manufacturer
+        model:
+          type: string
+          description: BaseBoard product model
+        serialNumber:
+          type: string
+          description: BaseBoard serial number
+        name:
+          type: string
+          description: BaseBoard name
+        version:
+          type: string
+          description: BaseBoard version
+        installDate:
+          type: string
+          description: BaseBoard installation date
+          format: date-time
+        hardwareUUID:
+          type: string
+          description: Machine UUID
+    assetPower:
+      type: object
+      properties:
+        powerType:
+          type: string
+          description: Power Type
+        sysSleepTimer:
+          type: string
+          description: Sys Sleep Timer
+        discSleepTimer:
+          type: string
+          description: Disc Sleep Timer
+        dispSleepTimer:
+          type: string
+          description: Disp Sleep Timer
+        sleepOnPower:
+          type: string
+          description: Sleep OnPower
+        autoRestart:
+          type: string
+          description: Auto Restart
+        wakeOnLan:
+          type: string
+          description: Wake On Lan
+        curPower:
+          type: string
+          description: Cur Power
+        usesDim:
+          type: string
+          description: Uses Dim
+        nWReachability:
+          type: string
+          description: NW Reachability
+        kernalRestart:
+          type: string
+          description: Kernal Restart
+        upsInstalled:
+          type: string
+          description: Ups Installed
+    assetBios:
+      type: object
+      properties:
+        product:
+          type: string
+          description: BIOS name
+        manufacturer:
+          type: string
+          description: BIOS manufacturer
+        version:
+          type: string
+          description: BIOS version
+        serialNumber:
+          type: string
+          description: BIOS serial number
+        smbiosVersion:
+          type: string
+          description: SMBIOS version
+    assetDrive:
+      type: object
+      properties:
+        product:
+          type: string
+          description: Drive product name
+        manufacturer:
+          type: string
+          description: Drive manufacturer name
+        mediaType:
+          type: string
+          description: Type of media
+        interfaceType:
+          type: string
+          description: Interface type of disk for ex. SCSI,SATA
+        logicalName:
+          type: string
+          description: Logical name of drive
+        serialNumber:
+          type: string
+          description: Serial number of drive
+        partitions:
+          type: array
+          description: Disk partitions information
+          items:
+            type: string
+        sizeBytes:
+          type: integer
+          description: Drive size in bytes
+          format: int64
+        numberOfPartitions:
+          type: integer
+          description: Number of partitions
+        partitionData:
+          $ref: '#/components/schemas/assetDrivePartition'
+        linkSpeed:
+          type: string
+          description: Link Speed
+        nLinkSpeed:
+          type: string
+          description: NLink Speed
+        description:
+          type: string
+          description: Description
+        nativeCmdQ:
+          type: string
+          description: Native Cmd Q
+        model:
+          type: string
+          description: Model
+        diskRevision:
+          type: string
+          description: Disk Revision
+        queueDepth:
+          type: string
+          description: Queue Depth
+        removableMedia:
+          type: string
+          description: Removable Media
+        detachable:
+          type: string
+          description: Detachable Drive
+        diskBSDName:
+          type: string
+          description: Disk BSD Name
+        rotationRate:
+          type: string
+          description: Rotation Rate
+        mediumType:
+          type: string
+          description: Medium Type
+        bayName:
+          type: string
+          description: BayName
+        partMapType:
+          type: string
+          description: Part Map Type
+        smartStatus:
+          type: string
+          description: Smart Status
+    assetDrivePartition:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the partition e.g. C
+        label:
+          type: string
+          description: Label or VolumeName of the partition
+        fileSystem:
+          type: string
+          description: FileSystem of the partition e.g. NTFS
+        description:
+          type: string
+          description: A textual description of the partition
+        sizeBytes:
+          type: integer
+          description: Size of the partition in bytes
+          format: int64
+        writable:
+          type: string
+          description: Writable
+        mountPoint:
+          type: string
+          description: MountPoint
+    physicalDrive:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of physical drive, it could be RemovableDrive,NetworkDrive,CDDrive,
+            etc.
+        partitions:
+          type: array
+          description: Number of partitions of a physical drive
+          items:
+            $ref: '#/components/schemas/assetDrivePartition'
+    assetMemory:
+      type: object
+      properties:
+        manufacturer:
+          type: string
+          description: Physical memory manufacturer
+        serialNumber:
+          type: string
+          description: Physical memory serial number
+        sizeBytes:
+          type: integer
+          description: Size of the physical memory in bytes
+          format: int64
+        ecc:
+          type: string
+          description: ECC
+        slot:
+          type: string
+          description: Slot
+        type:
+          type: string
+          description: Type
+        speed:
+          type: string
+          description: Speed
+        status:
+          type: string
+          description: Status
+        partNumber:
+          type: string
+          description: Part Number
+    assetNetwork:
+      type: object
+      properties:
+        vendor:
+          type: string
+          description: Ethernet vendor name
+        product:
+          type: string
+          description: Ethernet product name
+        dhcpEnabled:
+          type: boolean
+          description: If TRUE, DHCP server automatically assigns an IP address to
+            the computer system when establishing a network connection.
+        dhcpServer:
+          type: string
+          description: DHCP server IP address
+        dhcpServers:
+          type: array
+          description: DHCP server IP addresses
+          items:
+            type: string
+        dhcpLeaseObtained:
+          type: string
+          description: Date and time the lease was obtained for the IP address assigned
+            to the computer by the DHCP server.
+          format: date-time
+        dhcpLeaseExpires:
+          type: string
+          description: Expiration date and time for a leased IP address that was assigned
+            to the computer by the DHCP server.
+          format: date-time
+        dnsServers:
+          type: array
+          description: DNS servers IP addresses
+          items:
+            type: string
+        ipEnabled:
+          type: boolean
+          description: If TRUE, TCP/IP is bound and enabled on this network adapter.
+        ipv4:
+          type: string
+          description: IPv4 address
+        ipv4List:
+          type: array
+          description: Array of all of the IPv4 addresses associated with the current
+            network adapter.
+          items:
+            type: string
+        ipv6:
+          type: string
+          description: IPv6 address
+        ipv6List:
+          type: array
+          description: Array of all of the IPv6 addresses associated with the current
+            network adapter.
+          items:
+            type: string
+        subnetMask:
+          type: string
+          description: Subnet mask
+        subnetMasks:
+          type: array
+          description: Array of all of the subnet masks associated with the current
+            network adapter.
+          items:
+            type: string
+        defaultIPGateway:
+          type: string
+          description: Default gateway IP address
+        defaultIPGateways:
+          type: array
+          description: Array of IP addresses of default gateways that the computer
+            system uses.
+          items:
+            type: string
+        macAddress:
+          type: string
+          description: MAC address
+        winsPrimaryServer:
+          type: string
+          description: IP address for the primary WINS server.
+        winsSecondaryServer:
+          type: string
+          description: IP address for the secondary WINS server.
+        logicalName:
+          type: string
+          description: Logical name like eth0 eth1
+        interfaceIndex:
+          type: integer
+          description: Interface Index
+        speed:
+          type: integer
+          description: speed
+        version:
+          type: string
+          description: Version
+    assetEthernet:
+      type: object
+      properties:
+        broadCom:
+          type: string
+          description: Broad Com
+        name:
+          type: string
+          description: Name
+        type:
+          type: string
+          description: Type
+        bus:
+          type: string
+          description: Bus
+        ethrnetVendorID:
+          type: string
+          description: Ethernet Vendor ID
+        deviceID:
+          type: string
+          description: Device ID
+        subSysVendorID:
+          type: string
+          description: Sub Sys Vendor ID
+        subSysID:
+          type: string
+          description: SubSys ID
+        revisionID:
+          type: string
+          description: Revision ID
+        linkWidth:
+          type: string
+          description: Link Width
+        bsdName:
+          type: string
+          description: Bsd Name
+        kextName:
+          type: string
+          description: Kext Name
+        firmwareVersion:
+          type: string
+          description: Firmware Version
+        location:
+          type: string
+          description: Location
+        version:
+          type: string
+          description: Version
+    assetFirewall:
+      type: object
+      properties:
+        mode:
+          type: string
+          description: Mode
+        logging:
+          type: string
+          description: Logging
+        stealthMode:
+          type: string
+          description: StealthMode
+    assetLocations:
+      type: object
+      properties:
+        locType:
+          type: string
+          description: Location Type
+        activeLoc:
+          type: string
+          description: Active Location
+        locationServices:
+          type: array
+          description: Location Services
+          items:
+            $ref: '#/components/schemas/assetAssetLocationServices'
+    assetAssetLocationServices:
+      type: object
+      properties:
+        locDevName:
+          type: string
+          description: Location Dev Name
+        locBsdName:
+          type: string
+          description: Location Bsd Name
+        hrdMacAddr:
+          type: string
+          description: Hardwarerd Mac Address
+        devType:
+          type: string
+          description: Device Type
+        ipv4CnfMethod:
+          type: string
+          description: IPv4Cnf Method
+        ipv6CnfMethod:
+          type: string
+          description: IPv6Cnf Method
+        proxyExcPlist:
+          type: string
+          description: Proxy Exc Plist
+        proxyFTPMode:
+          type: string
+          description: Proxy FTP Mode
+        pppASCPEnabled:
+          type: string
+          description: PPPASCP Enabled
+        redialCount:
+          type: integer
+          description: Redial Count
+        redialEnabled:
+          type: string
+          description: Redial Enabled
+        redialInterval:
+          type: integer
+          description: Redial Interval
+        useTermScript:
+          type: string
+          description: Use Term Script
+        dialOnDemand:
+          type: string
+          description: DialOnDemand
+        disctFastSwitch:
+          type: string
+          description: Disc tFast Switch
+        idleDistconnect:
+          type: string
+          description: Idle Dist connect
+        idleDisctTimer:
+          type: integer
+          description: IdleDisctTimer
+        logOutDisct:
+          type: string
+          description: LogOut Disct
+        sleepDisct:
+          type: string
+          description: Sleep Disct
+        idleReminder:
+          type: string
+          description: Idle Reminder
+        idleRemTime:
+          type: integer
+          description: Idle RemTime
+        ipcpCmprVJ:
+          type: string
+          description: IpcpCmprVJ
+        lcpEchoEnbld:
+          type: string
+          description: Lcp Echo Enbld
+        lcpEchoFailure:
+          type: integer
+          description: Lcp Echo Failure
+        lcpEchoInterval:
+          type: integer
+          description: Lcp Echo Interval
+        logFile:
+          type: string
+          description: Log File
+        verboseLog:
+          type: string
+          description: Verbose Log
+        ieeeName:
+          type: string
+          description: IEEE Name
+        ieeeJoinMdFallBk:
+          type: string
+          description: IEEEJoinMdFallBk
+        ieeePowerEnbld:
+          type: boolean
+          description: IEEEPowerEnbld
+        ieeeRemJoinNw:
+          type: boolean
+          description: IEEERemJoinNw
+    assetCardReader:
+      type: object
+      properties:
+        vendorID:
+          type: string
+          description: Vendor ID
+        productID:
+          type: string
+          description: Product ID
+        revision:
+          type: string
+          description: Revision
+    assetGraphicCard:
+      type: object
+      properties:
+        displayArray:
+          type: string
+          description: Display Array
+        chipsetModel:
+          type: string
+          description: Chipset Model
+        displayType:
+          type: string
+          description: Display Type
+        displayBus:
+          type: string
+          description: Display Bus
+        pciLaneWidth:
+          type: string
+          description: PciLane Width
+        vRAM:
+          type: string
+          description: VRAM
+        vendor:
+          type: string
+          description: Vendor
+        disDeviceID:
+          type: string
+          description: DisDevice ID
+        dispRevisionID:
+          type: string
+          description: Disp Revision ID
+        romVer:
+          type: string
+          description: RomVer
+        efiDrvVer:
+          type: string
+          description: EfiDrvVer
+    assetBluetooth:
+      type: object
+      properties:
+        hardware:
+          $ref: '#/components/schemas/assetBluetoothHardware'
+        services:
+          type: array
+          description: Location Services
+          items:
+            $ref: '#/components/schemas/assetAssetBluetoothService'
+        devices:
+          type: array
+          description: Location Services
+          items:
+            $ref: '#/components/schemas/assetAssetBluetoothDevice'
+    assetBluetoothHardware:
+      type: object
+      properties:
+        version:
+          type: string
+          description: Version
+        address:
+          type: string
+          description: Address
+        manufacturer:
+          type: string
+          description: Manufacturer
+        name:
+          type: string
+          description: Name
+        firmwareVersion:
+          type: string
+          description: Firmware Version
+        power:
+          type: string
+          description: Power
+        discoverable:
+          type: string
+          description: Discoverable
+        vendorID:
+          type: string
+          description: Vendor ID
+        productID:
+          type: string
+          description: Product ID
+        hciVer:
+          type: string
+          description: HCIVer
+        hciRev:
+          type: string
+          description: HCIRev
+        lmpVer:
+          type: string
+          description: LMPVer
+        lmpSubVer:
+          type: string
+          description: LMPSubVer
+        cmpltDevType:
+          type: string
+          description: CmpltDevType
+        compstClass:
+          type: string
+          description: CompstClass
+        serviceClass:
+          type: string
+          description: ServClass
+        majorDeviceType:
+          type: string
+          description: MJRDevType
+        majorDeviceClass:
+          type: string
+          description: MjrDevCls
+        minorDeviceClass:
+          type: string
+          description: MinrDevCls
+    assetAssetBluetoothService:
+      type: object
+      properties:
+        version:
+          type: string
+          description: Version
+        serviceName:
+          type: string
+          description: Service Name
+        fldaccItem:
+          type: string
+          description: Fldacc Item
+        fldFileBrws:
+          type: string
+          description: Fld File Brws
+        authRequired:
+          type: string
+          description: Auth Required
+        state:
+          type: string
+          description: State
+        stateOthrItemsAccept:
+          type: string
+          description: State Othr Items Accept
+        othrPimItemsAccept:
+          type: string
+          description: Othr Pim Items Accept
+        receiveItemAction:
+          type: string
+          description: Receive Item Action
+    assetAssetBluetoothDevice:
+      type: object
+      properties:
+        deviceName:
+          type: string
+          description: Device Name
+        address:
+          type: string
+          description: Address
+        type:
+          type: string
+          description: Type
+        firmwareVersion:
+          type: string
+          description: Firmware Version
+        services:
+          type: string
+          description: Services
+        paired:
+          type: string
+          description: Paired
+        favorite:
+          type: string
+          description: Favorite
+        connected:
+          type: string
+          description: Connected
+        manufacturer:
+          type: string
+          description: Manufacturer
+        vendorID:
+          type: string
+          description: Vendor ID
+        productID:
+          type: string
+          description: Product ID
+        majorType:
+          type: string
+          description: Major Type
+        deviceClass:
+          type: string
+          description: Device Class
+        minorType:
+          type: string
+          description: Minor Type
+        edrsSupported:
+          type: string
+          description: EDR Supported
+        escoSupported:
+          type: string
+          description: ESCO Supported
+    assetUSBBus:
+      type: object
+      properties:
+        board:
+          type: string
+          description: Board
+        hstCtrlLocation:
+          type: string
+          description: HstCtrl Location
+        hstCtrlDrv:
+          type: string
+          description: HstCtrlDrv
+        pciDeviceID:
+          type: string
+          description: Pci Device ID
+        pciRevisionID:
+          type: string
+          description: Pci Revision ID
+        pciVendorID:
+          type: string
+          description: Pci Vendor ID
+        busNum:
+          type: string
+          description: Bus Num
+        devices:
+          type: array
+          description: Devices
+          items:
+            $ref: '#/components/schemas/assetAssetUSBDevice'
+    assetAssetUSBDevice:
+      type: object
+      properties:
+        deviceName:
+          type: string
+          description: Device Name
+        productID:
+          type: string
+          description: Product ID
+        vendorID:
+          type: string
+          description: Vendor ID
+        version:
+          type: string
+          description: Version
+        serialNum:
+          type: string
+          description: Serial Num
+        speed:
+          type: string
+          description: Speed
+        manufacturer:
+          type: string
+          description: Manufacturer
+        locID:
+          type: string
+          description: Loc ID
+        currAvl:
+          type: string
+          description: Curr Avl
+        currReq:
+          type: string
+          description: Curr Req
+    assetAssetDiagnostic:
+      type: object
+      properties:
+        testName:
+          type: string
+          description: Name
+        lastRunOn:
+          type: string
+          description: Last Run On
+        result:
+          type: string
+          description: Result
+    assetDiscBurning:
+      type: object
+      properties:
+        modelName:
+          type: string
+          description: Model Name
+        firmwareRevision:
+          type: string
+          description: Firmware Revision
+        interconnect:
+          type: string
+          description: Interconnect
+        burSupport:
+          type: string
+          description: Bur Support
+        cache:
+          type: string
+          description: Cache
+        readDVD:
+          type: string
+          description: Read DVD
+        cdWrite:
+          type: string
+          description: CD Write
+        dvdWrite:
+          type: string
+          description: DVD Write
+        writeStrtgy:
+          type: string
+          description: Write Stratergy
+        media:
+          type: string
+          description: Media
+    assetThunderbolt:
+      type: object
+      properties:
+        vendorName:
+          type: string
+          description: Vendor Name
+        deviceName:
+          type: string
+          description: Device Name
+        UID:
+          type: string
+          description: UID
+        firmwareVersion:
+          type: string
+          description: Firmware Version
+        portStatus:
+          type: string
+          description: Port Status
+        portLink:
+          type: string
+          description: Port Link
+        portFirmwareVersion:
+          type: string
+          description: Port Firmware Version
+    assetOs:
+      type: object
+      properties:
+        product:
+          type: string
+          description: Operating system product name
+        manufacturer:
+          type: string
+          description: Operating system manufacturer name
+        osLanguage:
+          type: string
+          description: Operating system language
+        serialNumber:
+          type: string
+          description: Operating system serial number
+        version:
+          type: string
+          description: Operating system version
+        installDate:
+          type: string
+          description: Operating system installation date
+          format: date-time
+        type:
+          type: string
+          description: Operating system type
+        arch:
+          type: string
+          description: Operating system architecture
+        servicePack:
+          type: string
+          description: Operating system service pack
+        osInstalledDrive:
+          type: string
+          description: Drive on which the OS is installed
+        buildNumber:
+          type: string
+          description: Build number of the Operating System
+        releaseID:
+          type: string
+          description: Release id of the Operating System
+        productID:
+          type: string
+          description: Operating system Id
+        productKey:
+          type: string
+          description: Operating system license key
+        bootVolume:
+          type: string
+          description: Boot Volume
+        bootMode:
+          type: string
+          description: Boot Mode
+        userName:
+          type: string
+          description: User Name
+        virMem:
+          type: string
+          description: Vir Mem
+        bitKerExt:
+          type: string
+          description: BitKerExt
+        bootDuration:
+          type: string
+          description: Boot Duration
+        kernelVersion:
+          type: string
+          description: Kernel Version
+    assetProcessor:
+      type: object
+      properties:
+        product:
+          type: string
+          description: Processor product name
+        numberOfProcessors:
+          type: integer
+          description: Number of processors
+          format: int32
+        numberOfCores:
+          type: integer
+          description: Number of cores
+          format: int32
+        clockSpeedMhz:
+          type: string
+          description: Processor clock speed in MegaHertz
+        family:
+          type: integer
+          description: Processor family
+          format: int32
+        manufacturer:
+          type: string
+          description: Processor manufacturer name
+        processorType:
+          type: string
+          description: Processor type
+        serialNumber:
+          type: string
+          description: Processor serial number
+        level:
+          type: integer
+          description: Processor level
+        numberOfLogicalProcessors:
+          type: integer
+          description: Number of logical processors
+        l2Cache:
+          type: string
+          description: L2 Cache
+        l3Cache:
+          type: string
+          description: L3 Cache
+        bootRom:
+          type: string
+          description: Boot Rom
+        version:
+          type: string
+          description: Processor version
+    assetRaidController:
+      type: object
+      properties:
+        softwareRaid:
+          type: string
+          description: Software RAID information
+        hardwareRaid:
+          type: string
+          description: Hardware RAID information
+        vendor:
+          type: string
+          description: RAID vendor information
+    assetSystem:
+      type: object
+      properties:
+        product:
+          type: string
+          description: System product information
+        model:
+          type: string
+          description: System model information
+        timeZone:
+          type: string
+          description: System time zone information
+        timeZoneDescription:
+          type: string
+          description: System time zone description
+        serialNumber:
+          type: string
+          description: System serial number
+        systemName:
+          type: string
+          description: System serial name
+        domain:
+          type: string
+          description: Name of the domain to which the computer system belongs
+        domainRole:
+          type: integer
+          description: Computer system role assigned in domain-workgroup
+        chassisTypes:
+          type: array
+          description: Chassis types of endpoint
+          items:
+            type: integer
+        hypervisorName:
+          type: string
+          description: Name of Hypervisor for endpoint
+    assetInstalledSoftwares:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the installed software
+        version:
+          type: string
+          description: Version of the installed software
+        publisher:
+          type: string
+          description: Publisher of the installed software
+        installDate:
+          type: string
+          description: Date on which software was installed
+          format: date-time
+        userName:
+          type: string
+          description: Name of the user under which software is installed
+        lastAccessDateTime:
+          type: string
+          description: Date on which software was last accessed
+          format: date-time
+        kind:
+          type: string
+          description: Kind
+        intel64Bit:
+          type: string
+          description: Intel 64 Bit
+        getInfoString:
+          type: string
+          description: Get Info String
+        appStore:
+          type: string
+          description: App Store
+        location:
+          type: string
+          description: Location
+        installedSizeBytes:
+          type: string
+          description: Installed size in bytes
+    assetKeyboards:
+      type: object
+      properties:
+        deviceID:
+          type: string
+          description: Unique identifier of the device
+        name:
+          type: string
+          description: Name of the device
+        description:
+          type: string
+          description: Detailed textual description of the device
+    mouse:
+      type: object
+      properties:
+        manufacturer:
+          type: string
+          description: Manufacturer of the mouse
+        name:
+          type: string
+          description: Name/caption of the mouse
+        deviceId:
+          type: string
+          description: Device ID of the mouse
+        deviceInterface:
+          type: integer
+          description: Type of interface used for the pointing device. For ex. PS/2,USB
+            etc.
+        pointingType:
+          type: integer
+          description: Pointing Type of the device
+        buttons:
+          type: integer
+          description: Number of buttons on the pointing device
+    assetMonitors:
+      type: object
+      properties:
+        deviceID:
+          type: string
+          description: Unique identifier of the device
+        name:
+          type: string
+          description: Name of the device
+        manufacturer:
+          type: string
+          description: Manufacturer of the monitor
+        screenHeight:
+          type: integer
+          description: The logical height of the display in screen coordinates
+        screenWidth:
+          type: integer
+          description: The logical width of the display in screen coordinates
+        resolution:
+          type: string
+          description: Resolution
+        pixelDepth:
+          type: string
+          description: Pixel Depth
+        mainDisplay:
+          type: string
+          description: Main Display
+        mirror:
+          type: string
+          description: Mirror
+        online:
+          type: string
+          description: Mirror
+        builtin:
+          type: string
+          description: Builtin
+        connType:
+          type: string
+          description: Connection Type
+    user:
+      type: object
+      properties:
+        username:
+          type: string
+          description: Unique identifier of the device
+        userType:
+          type: string
+          description: Whether a guest or Admin account
+        userDisabled:
+          type: boolean
+          description: Whether Enable/Disabled
+        userLockout:
+          type: boolean
+          description: Is User account locked out
+        passwordRequired:
+          type: boolean
+          description: Account requires a password or not
+    assetService:
+      type: object
+      properties:
+        serviceName:
+          type: string
+          description: Name of the service
+        displayName:
+          type: string
+          description: Display name of the service
+        executablePath:
+          type: string
+          description: Path to executable
+        startupType:
+          type: string
+          description: Startup type of the service
+        serviceStatus:
+          type: string
+          description: Status of the service
+        logOnAs:
+          type: string
+          description: Log on as. Example- Local system
+        stopEnableAction:
+          type: boolean
+          description: Enable actions for stops
+        delayedAutoStart:
+          type: boolean
+          description: If True, the service is started after other auto-start services  are
+            started plus a short delay
+        win32ExitCode:
+          type: integer
+          description: 'Error code that defines errors encountered in starting or  stopping
+            the service '
+          format: int32
+        serviceSpecificExitCode:
+          type: integer
+          description: Service-specific error code for errors that occur while  the
+            service is either starting or stopping
+          format: int32
+    assetShares:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the share
+        caption:
+          type: string
+          description: Caption of the share
+        description:
+          type: string
+          description: Description of the share
+        path:
+          type: string
+          description: Path of executable
+        access:
+          type: string
+          description: Access of the share
+        userAccess:
+          type: array
+          description: User access information
+          items:
+            type: string
+        type:
+          type: array
+          description: Type information
+          items:
+            type: string
+        mountFrom:
+          type: string
+          description: Mount From
+        autoMount:
+          type: string
+          description: Auto Mount
+    assetSoftwareLicenses:
+      type: object
+      properties:
+        productName:
+          type: string
+          description: Name of software
+        productId:
+          type: string
+          description: ID of software
+        productKey:
+          type: string
+          description: Software license Key
+    assetPCIDevices:
+      type: object
+      properties:
+        deviceId:
+          type: string
+          description: ID of pci device
+        deviceName:
+          type: string
+          description: Name of pci device
+        vendorName:
+          type: string
+          description: Name of pci device vendor
+        id:
+          type: string
+          description: ID
+    assetLogicalVolume:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the logical volume
+        description:
+          type: string
+          description: Description of the logical volume
+        capacity:
+          type: integer
+          description: Capacity of logical volume
+          format: int64
+        dfsize:
+          type: integer
+          description: Total Size of Logical Volume
+          format: int64
+        freeSpaceBytes:
+          type: integer
+          description: Free Space of Logical Volume
+          format: int64
+        usedSpaceBytes:
+          type: integer
+          description: Used Space of Logical Volume
+          format: int64
+    friendlynameUpdatePayload:
+      type: object
+      properties:
+        friendlyname:
+          type: string
+          description: New friendly name which needs to be updated
+    endpointTypeUpdatePayload:
+      type: object
+      properties:
+        endpointtype:
+          type: string
+          description: New endpoint type which needs to be updated
+    endpointList:
+      type: object
+      properties:
+        endpoints:
+          type: array
+          items:
+            $ref: '#/components/schemas/endpoint'
+    host:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the host
+        virtualSwitches:
+          type: array
+          items:
+            $ref: '#/components/schemas/virtualSwitch'
+        datastores:
+          type: array
+          items:
+            $ref: '#/components/schemas/datastore'
+        cluster:
+          $ref: '#/components/schemas/cluster'
+    hostinventory:
+      type: object
+      properties:
+        createTimeUTC:
+          type: string
+          description: Time when inventory data was collected
+          format: date-time
+        hostType:
+          type: string
+          description: Type of host endpoint
+        host:
+          $ref: '#/components/schemas/host'
+    guestinventory:
+      type: object
+      properties:
+        createTimeUTC:
+          type: string
+          description: Time when inventory data was collected
+          format: date-time
+        endpointID:
+          type: string
+          description: EndpointId of Host
+        guests:
+          type: array
+          items:
+            $ref: '#/components/schemas/guest'
+    guest:
+      type: object
+      properties:
+        instanceId:
+          type: string
+          description: Id of guest
+        endpointID:
+          type: string
+          description: Endpoint Id of the Agent if installed on guest machine
+        guestName:
+          type: string
+          description: Name of guest machine
+        machineName:
+          type: string
+          description: MachineName is the system name
+        friendlyName:
+          type: string
+          description: Friendly name of the machine
+        vmState:
+          type: string
+          description: State of guest
+        vmStatus:
+          type: string
+          description: Status of guest
+        os:
+          $ref: '#/components/schemas/guestOS'
+        vmGeneration:
+          type: string
+          description: Generation of guest
+        hasDependentTools:
+          type: boolean
+          description: In order to get some extra information
+        vmpath:
+          type: string
+          description: Path for vm
+        networks:
+          type: array
+          description: Network Details of guest
+          items:
+            $ref: '#/components/schemas/guestNetwork'
+        memory:
+          $ref: '#/components/schemas/guestMemory'
+        disks:
+          $ref: '#/components/schemas/guestDisk'
+        replications:
+          $ref: '#/components/schemas/guestReplication'
+        storage:
+          $ref: '#/components/schemas/storage'
+        snapshots:
+          type: array
+          items:
+            $ref: '#/components/schemas/guestSnapshot'
+        numberOfvCPU:
+          type: integer
+          description: Number of Virtual CPUs
+        vmUptimeSeconds:
+          type: integer
+          description: Time since the machine was last turned on, reset, or restored
+          format: int64
+        integrationServices:
+          type: array
+          description: Integration Service Details of guest
+          items:
+            $ref: '#/components/schemas/guestService'
+    storage:
+      type: object
+      properties:
+        iSCSIs:
+          type: array
+          description: List id iSCSI connected to the host
+          items:
+            $ref: '#/components/schemas/iscsi'
+        datastores:
+          type: array
+          description: List id datastores connected to the host
+          items:
+            $ref: '#/components/schemas/datastore'
+    datastore:
+      type: object
+      properties:
+        guid:
+          type: string
+          description: Datastore GUID
+        name:
+          type: string
+          description: Datastore name
+        capacityInBytes:
+          type: integer
+          description: Datastore capacity in bytes
+          format: int64
+        committedBytes:
+          type: integer
+          description: Datastore committedBytes in bytes
+          format: int64
+        uncommittedBytes:
+          type: integer
+          description: Datastore uncommittedBytes in bytes
+          format: int64
+        multipleHostAccess:
+          type: boolean
+          description: Indicates if more than one host in the datacenter has been
+            configured
+        type:
+          type: string
+          description: Datastore type
+        luns:
+          type: array
+          description: Part of a configured set of disks
+          items:
+            $ref: '#/components/schemas/lun'
+    iscsi:
+      type: object
+      properties:
+        targetName:
+          type: string
+          description: iSCSI target name
+        status:
+          type: string
+          description: Status of iSCSI target
+        luns:
+          type: array
+          description: Part of a configured set of disks
+          items:
+            $ref: '#/components/schemas/lun'
+    lun:
+      type: object
+      properties:
+        diskName:
+          type: string
+          description: Name of disk
+        noOfPartition:
+          type: integer
+          description: Disk partitions
+    guestNetwork:
+      type: object
+      properties:
+        macAddress:
+          type: string
+          description: MAC Address of guest
+        ipv4:
+          type: array
+          description: Array of all of the IPv4 addresses associated with the current
+            network adapter.
+          items:
+            type: string
+        ipv6:
+          type: array
+          description: Array of all of the IPv6 addresses associated with the current
+            network adapter.
+          items:
+            type: string
+        ipEnabled:
+          type: boolean
+          description: If TRUE, TCP/IP is bound and enabled on this network adapter.
+        portgroup:
+          type: string
+          description: Name of the virtual switch portgroup or dvPort connected to
+            this adapter
+        vlanID:
+          type: integer
+          description: Vlan id
+          format: int64
+        vswitch:
+          $ref: '#/components/schemas/virtualSwitch'
+    guestMemory:
+      type: object
+      properties:
+        allocatedBytes:
+          type: integer
+          description: Allocated Memory to guest
+          format: int64
+        startupBytes:
+          type: integer
+          description: Startup Memory of guest
+          format: int64
+        minimumBytes:
+          type: integer
+          description: Minimum Memory of guest
+          format: int64
+        maximumBytes:
+          type: integer
+          description: Maximum Memory of guest
+          format: int64
+        memoryType:
+          type: string
+          description: Guest has which type of memory
+    guestOS:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the OS of guest
+        version:
+          type: string
+          description: Version of the OS
+        buildNumber:
+          type: string
+          description: Build number of the OS of guest
+        releaseID:
+          type: string
+          description: Release id of the Operating System
+    guestDisk:
+      type: array
+      items:
+        type: object
+        properties:
+          diskPath:
+            type: string
+            description: Disk path of the guest
+          capacityInBytes:
+            type: integer
+            description: Capacity of disk
+            format: int64
+          consumptionInBytes:
+            type: integer
+            description: Consumption of disk
+            format: int64
+    guestService:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Integration Service Name of the guest
+        state:
+          type: boolean
+          description: Integration Service state
+    guestReplication:
+      type: array
+      items:
+        type: object
+        properties:
+          state:
+            type: string
+            description: State of replication
+          health:
+            type: string
+            description: Health of replication
+          mode:
+            type: string
+            description: Mode of replication
+          lastReplicationTimeUTC:
+            type: string
+            description: Last replication time
+            format: date-time
+          frequencyInSec:
+            type: integer
+            description: Frequency of replication
+            format: int32
+          primaryServer:
+            type: string
+            description: Primary server of replication
+          replicaServer:
+            type: string
+            description: Replica server of replication
+          authenticationType:
+            type: string
+            description: Authentication type of replication
+          port:
+            type: string
+            description: Port of replication
+          relationshipType:
+            type: string
+            description: Relation type of replication
+    guestSnapshot:
+      type: object
+      properties:
+        name:
+          type: string
+          description: name of the snapshot
+        description:
+          type: string
+          description: description of snapshot
+        id:
+          type: string
+          description: id is unique identifier that distinguishes this snapshot from
+            other snapshots of the virtual machine.
+        createTime:
+          type: string
+          description: date and time the snapshot was taken.
+          format: date-time
+        childSnapshots:
+          type: array
+          description: snapshot of a virtual machine taken after the parent snapshot
+          items:
+            $ref: '#/components/schemas/guestSnapshot'
+        state:
+          type: string
+          description: indicates the power state of the virtual machine when this
+            snapshot was taken
+        quiesced:
+          type: boolean
+          description: Quiesced indicates whether the virtual computer is into a state
+            suitable for backups,Quiescing a file system is a process of bringing
+            the on-disk data of a physical or virtual computer into a state suitable
+            for backups
+        replaySupported:
+          type: boolean
+          description: ReplaySupported indicates whether it is allowed to run a program
+            in a virtual machine under Workstation,record the entire execution of
+            the program, including all of itsinput and output, and later repeat (or"replay")
+            the entire  execution.
+    virtualSwitch:
+      type: object
+      properties:
+        type:
+          type: string
+          description: type of switch (eg - standard,distributed)
+        name:
+          type: string
+          description: name of switch
+        physicalNICs:
+          type: array
+          description: set of physical network adapters associated with this bridge.
+          items:
+            $ref: '#/components/schemas/physicalNIC'
+        portGroups:
+          type: array
+          description: list of port groups configured for this virtual switch.
+          items:
+            $ref: '#/components/schemas/portGroup'
+        uplinkPortGroups:
+          type: array
+          description: multiple uplink port groups can be created for different purposes
+            like mgmt , vmotion , NFS or FT traffic.
+          items:
+            $ref: '#/components/schemas/uplinkPortGroup'
+        allowManagementOS:
+          type: boolean
+          description: allows the management operating system to share this network
+            adapter setting if set to true
+        connectedVMs:
+          type: array
+          description: List of vms connected to this switch
+          items:
+            $ref: '#/components/schemas/connectedVM'
+    connectedVM:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the VM
+    physicalNIC:
+      type: object
+      properties:
+        key:
+          type: string
+          description: unique identifier for PhysicalNIC
+        name:
+          type: string
+          description: Name in interface name
+        mac:
+          type: string
+          description: media access control (MAC) address of the physical network
+            adapter.
+        description:
+          type: string
+          description: Network interface description
+        ifindex:
+          type: integer
+          description: IfIndex of the interface
+          format: int64
+        linkSpeed:
+          type: integer
+          description: LinkSpeed of the interface
+          format: int64
+        status:
+          type: string
+          description: Status of the interface
+        teamName:
+          type: string
+          description: TeamName name of the team if NIC teaming is enabled
+        teamingMode:
+          type: string
+          description: Teaming mode
+        loadBalancingMode:
+          type: string
+          description: Load balancing mode
+    portGroup:
+      type: object
+      properties:
+        key:
+          type: string
+          description: unique identifier for Port Group
+        name:
+          type: string
+          description: Name in interface name
+    uplinkPortGroup:
+      type: object
+      properties:
+        key:
+          type: string
+          description: unique identifier for uplink
+        name:
+          type: string
+          description: Name in interface name
+    endpoint:
+      type: object
+      properties:
+        partnerID:
+          type: string
+          description: Partner id
+        clientID:
+          type: string
+          description: Client id
+        siteID:
+          type: string
+          description: Site id
+        endpointID:
+          type: string
+          description: Endpoint id
+    cluster:
+      type: object
+      properties:
+        dataCenterName:
+          type: string
+          description: The display name of a data center
+        name:
+          type: string
+          description: The display name of a cluster
+        haenabeld:
+          type: boolean
+          description: Indicates whether or not vSphere HA(High Availability) feature
+            is enabled
+        failOverLevel:
+          type: integer
+          description: The number of physical host failures that can be tolerated
+            without impacting the ability to satisfy the minimums for all running
+            virtual machines
+        hostMonitoring:
+          type: string
+          description: When it is enabled, HA(High Availability)  restarts virtual
+            machines after a host fails.
+        vmmonitoring:
+          type: string
+          description: Provides level of HA(High Availability) Virtual Machine Health
+            Monitoring Service
+        dpmenabled:
+          type: boolean
+          description: Indicates whether or not the distributed power management service
+            is enabled
+        drsenabled:
+          type: boolean
+          description: Indicates whether or not the distributed resource scheduling
+            service is enabled
+        drsbahaviour:
+          type: string
+          description: Indicates distributed resource scheduling behaviour
+        vmotionRate:
+          type: integer
+          description: The threshold for generated ClusterRecommendations
+        totalVmotions:
+          type: integer
+          description: Indicates total number of migrations with VMotion that have
+            been done internal to this cluster
+        ecvMode:
+          type: boolean
+          description: Indicates the enhanced VMotion Compatibility mode that is currently
+            in effect for all hosts in this cluster
+        quorumPolicy:
+          type: string
+          description: The current quorum type eg "Majority", "No Majority" etc
+        states:
+          type: array
+          description: States of the cluster resources
+          items:
+            $ref: '#/components/schemas/clusterState'
+        nodes:
+          type: array
+          description: List of nodes in the cluster
+          items:
+            $ref: '#/components/schemas/clusterNode'
+        csvs:
+          type: array
+          description: List of cluster shared volumes
+          items:
+            $ref: '#/components/schemas/csv'
+    clusterState:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the resource
+        state:
+          type: string
+          description: Last known state of the resource
+    clusterNode:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the node
+        state:
+          type: string
+          description: Last known state of the node
+    csv:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the shared volume
+        capacityInBytes:
+          type: integer
+          description: CSV capacity in bytes
+          format: int64
+        freeSpaceInBytes:
+          type: integer
+          description: CSV free space in bytes
+          format: int64
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+            description:
+              type: string
+    Networks:
+      type: array
+      items:
+        type: object
+        properties:
+          name:
+            type: string
+          macAddress:
+            type: string
+          connected:
+            type: boolean
+          ipv4:
+            type: string
+          ipv6:
+            type: string
+    Parent:
+      type: object
+      properties:
+        partnerID:
+          type: string
+        clientID:
+          type: string
+        siteID:
+          type: string
+        endpointID:
+          type: string
+        uuid:
+          type: string
+        hostname:
+          type: string
+        type:
+          type: string
+        version:
+          type: string
+        hasAgent:
+          type: boolean
+        isMonitored:
+          type: boolean
+        dctimeStampUTC:
+          type: string
+          format: date-time
+        eventTimeStampUTC:
+          type: string
+          format: date-time
+        eventType:
+          type: string
+        state:
+          type: string
+        networks:
+          $ref: '#/components/schemas/Networks'
+        Parent:
+          $ref: '#/components/schemas/Parent'
+    InterAsset:
+      type: object
+      properties:
+        partnerID:
+          type: string
+        clientID:
+          type: string
+        siteID:
+          type: string
+        endpointID:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+        os:
+          type: string
+        hostname:
+          type: string
+        state:
+          type: string
+        uuid:
+          type: string
+        hasAgent:
+          type: boolean
+        isMonitored:
+          type: boolean
+        networks:
+          $ref: '#/components/schemas/Networks'
+        Parent:
+          $ref: '#/components/schemas/Parent'
+    InterAssetV2:
+      type: object
+      properties:
+        name:
+          type: string
+        endpointID:
+          type: string
+        uniqueId:
+          type: string
+        relationshipType:
+          type: string
+        relatedTo:
+          type: array
+          items:
+            $ref: '#/components/schemas/RelationsRelatedTo'
+    RelationsRelatedTo:
+      type: object
+      properties:
+        name:
+          type: string
+        endpointID:
+          type: string
+        uniqueId:
+          type: string
+        relationshipType:
+          type: string
+    ServiceList:
+      type: object
+      properties:
+        partnerID:
+          type: string
+        services:
+          type: array
+          items:
+            $ref: '#/components/schemas/Services'
+    Services:
+      type: object
+      properties:
+        serviceName:
+          type: string
+        displayName:
+          type: string
+  parameters:
+    partnerID:
+      name: partnerID
+      in: path
+      description: partnerID
+      required: true
+      schema:
+        type: string
+    clientID:
+      name: clientID
+      in: path
+      description: clientID
+      required: true
+      schema:
+        type: string
+    siteID:
+      name: siteID
+      in: path
+      description: siteID
+      required: true
+      schema:
+        type: string
+    endpointID:
+      name: endpointID
+      in: path
+      description: endpointID
+      required: true
+      schema:
+        type: string
